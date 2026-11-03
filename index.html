@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="referrer" content="unsafe-url">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0b0d10">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Trading Desk</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="dot"></span>Trading<b>Desk</b></div>
+  <nav id="tabs">
+    <button data-t="panoramica" class="on">Oggi</button>
+    <button data-t="scanner">Scanner</button>
+    <button data-t="analisi">Analisi</button>
+    <button data-t="macro">Macro</button>
+    <button data-t="news">News</button>
+    <button data-t="rischio">Rischio</button>
+  </nav>
+  <div class="clock" id="clock">--:--</div>
+</header>
+<div class="tape" id="tape"></div>
+
+<main>
+<!-- OGGI -->
+<section id="panoramica" class="tab on">
+  <div class="grid g3" id="sessions"></div>
+  <div class="grid g-an">
+    <div class="card" id="brief"><div class="sk tall"></div></div>
+    <div class="card" id="goldDrv"><div class="sk"></div></div>
+  </div>
+  <h2>Sessioni di oggi <small>massimi e minimi per Asia, Londra e New York</small></h2>
+  <div class="bar"><select id="sesSym"></select></div>
+  <div class="grid g2">
+    <div class="card" id="sesBox"><div class="sk"></div></div>
+    <div class="card" id="htfBox"><div class="sk"></div></div>
+  </div>
+  <h2>Eventi di oggi <small id="calSrc"></small></h2>
+  <div class="card" id="todayEv"><div class="sk"></div></div>
+</section>
+
+<!-- SCANNER -->
+<section id="scanner" class="tab">
+  <div class="bar"><span class="note" style="margin:0">Tutti gli strumenti in ordine di punteggio: tecnica multi-timeframe + fondamentale + COT + calendario. Calcolato su 1H.</span><button id="scanReload" class="ghost">Aggiorna</button></div>
+  <div class="card pad0"><div class="tbl" id="scanTbl"><div class="sk tall"></div></div></div>
+  <p class="note">"In zona di ingresso" = prezzo dentro la zona del ritracciamento con punteggio ≥ 6. "Bloccato" = dato ad alto impatto entro 2 ore sulle valute della coppia. Sono ipotesi condizionate: attendi sempre conferma sul grafico.</p>
+</section>
+
+<!-- ANALISI -->
+<section id="analisi" class="tab">
+  <div class="bar">
+    <select id="sym"></select>
+    <div class="seg" id="tfseg"></div>
+    <button id="reload" class="ghost">Aggiorna</button>
+  </div>
+  <div id="evWarn"></div>
+  <div class="grid g-an">
+    <div class="card pad0"><div class="tv" id="w-chart" style="height:520px"></div></div>
+    <div class="card" id="verdict"><div class="sk tall"></div></div>
+  </div>
+  <div class="grid g3">
+    <div class="card" id="mtf"></div>
+    <div class="card" id="levels"></div>
+    <div class="card" id="scen"></div>
+  </div>
+  <div class="grid g3">
+    <div class="card" id="aSes"></div>
+    <div class="card" id="aHtf"></div>
+    <div class="card" id="aFund"></div>
+  </div>
+  <div class="card" id="bt"><h3>Verifica sullo storico</h3><p class="note">Controlla come sarebbe andato lo scenario "ritracciamento" negli ultimi mesi su questo strumento.</p><button class="ghost" id="btRun">Esegui verifica (4H e 1H)</button><div id="btOut"></div></div>
+  <div class="grid g2">
+    <div class="card"><h3>Consenso indicatori TradingView</h3><div class="tv" id="w-ta" style="height:420px"></div></div>
+    <div class="card"><h3>Notizie sullo strumento</h3><div class="tv" id="w-symnews" style="height:420px"></div></div>
+  </div>
+  <p class="note" id="srcnote"></p>
+</section>
+
+<!-- MACRO -->
+<section id="macro" class="tab">
+  <h2>Pagella delle valute <small id="macroUpd"></small></h2>
+  <div class="grid g4" id="grades"></div>
+  <h2>Dati dei paesi</h2>
+  <div class="card pad0"><div class="tbl" id="ctyTbl"></div></div>
+  <h2>COT · posizionamento speculatori <small id="cotDate"></small></h2>
+  <div class="card pad0"><div class="tbl" id="cotTbl"></div></div>
+  <div class="grid g2">
+    <div class="card"><h3>Calendario della settimana</h3><div class="seg" id="calseg" style="margin-bottom:10px"><button data-i="High" class="on">Alto impatto</button><button data-i="Medium">+ Medio</button></div><div id="calList"></div></div>
+    <div class="card"><h3>Oro fisico · BullionVault</h3><div id="bvBox"></div><h3 style="margin-top:18px">Termometro mercati</h3><div class="tv" id="w-macroq" style="height:420px"></div></div>
+  </div>
+  <div class="grid g2">
+    <div class="card"><h3>Calendario TradingView</h3><div class="tv" id="w-events" style="height:560px"></div></div>
+    <div class="card"><h3>Forza delle valute</h3><div class="tv" id="w-heat" style="height:560px"></div></div>
+  </div>
+</section>
+
+<!-- NEWS -->
+<section id="news" class="tab">
+  <div class="bar">
+    <div class="seg" id="newsseg">
+      <button data-f="all" class="on">Tutte</button><button data-f="gold">Oro</button><button data-f="usd">USD/Fed</button><button data-f="fx">Forex</button><button data-f="it">Italia/Europa</button>
+    </div>
+    <span class="live"><i></i> aggiornamento automatico</span>
+  </div>
+  <div class="links">
+    <a href="https://www.newsquawk.com/headlines" target="_blank" rel="noopener">Newsquawk live</a>
+    <a href="https://finviz.com/forex.ashx" target="_blank" rel="noopener">Finviz Forex</a>
+    <a href="https://finviz.com/futures.ashx" target="_blank" rel="noopener">Finviz Futures</a>
+    <a href="https://tradingeconomics.com/calendar" target="_blank" rel="noopener">Trading Economics</a>
+    <a href="https://www.bullionvault.com/gold-price-chart.do" target="_blank" rel="noopener">BullionVault</a>
+  </div>
+  <div class="grid g-news">
+    <div class="card"><h3>Breaking feed <small id="newsUpd"></small></h3><div id="feed"><div class="sk"></div><div class="sk"></div></div></div>
+    <div class="card"><h3>Flusso TradingView</h3><div class="tv" id="w-news" style="height:760px"></div></div>
+  </div>
+</section>
+
+<!-- RISCHIO -->
+<section id="rischio" class="tab">
+  <div class="grid g2">
+    <div class="card">
+      <h3>Calcolatore posizione</h3>
+      <div class="form">
+        <label>Capitale (€/$)<input id="r-cap" type="number" value="10000"></label>
+        <label>Rischio %<input id="r-pct" type="number" value="1" step="0.1"></label>
+        <label>Strumento<select id="r-ins">
+          <option value="xau">XAUUSD (1 lotto = 100 oz)</option>
+          <option value="xag">XAGUSD (1 lotto = 5.000 oz)</option>
+          <option value="fx">Forex coppie xxxUSD (1 lotto = 100.000)</option>
+          <option value="jpy">Coppie JPY</option>
+        </select></label>
+        <label>Entry<input id="r-en" type="number" step="0.00001"></label>
+        <label>Stop loss<input id="r-sl" type="number" step="0.00001"></label>
+        <label>Take profit<input id="r-tp" type="number" step="0.00001"></label>
+      </div>
+      <div id="r-out" class="rout"></div>
+    </div>
+    <div class="card">
+      <h3>Regole di disciplina</h3>
+      <ul class="rules">
+        <li>Non entrare nei 15 minuti prima di un dato ad alto impatto (CPI, NFP, FOMC).</li>
+        <li>Rapporto rischio/rendimento minimo 1:1,5.</li>
+        <li>Stop oltre lo swing, non a distanza arbitraria: usa l'ATR come misura.</li>
+        <li>Se tecnica e macro sono in contrasto, riduci size o aspetta.</li>
+        <li>Rischio totale aperto massimo 3% del capitale.</li>
+      </ul>
+      <p class="note">Strumento di supporto alle decisioni, non consulenza finanziaria.</p>
+    </div>
+  </div>
+</section>
+</main>
+<footer>Prezzi: Dukascopy spot (bid) · Macro: OCSE, BIS · COT: CFTC · Calendario: Forex Factory · Oro fisico: BullionVault · Grafici e widget: TradingView · News: feed RSS pubblici. Fonti gratuite.</footer>
+<script>window.__API__ = "__PORT_8000__";</script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
